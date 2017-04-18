@@ -1,0 +1,35 @@
+---
+title: "Seguimiento PF 2017-04-20"
+author: "Cristian Gómez Alvarez"
+date: "17 de abril de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Correlación y Regresión
+
+En el siguiente ejercicio se estudiará la correlación entre el resultado de hemoglobina glicosilada (HbA1c) y la creatinina en personas diabéticas en tres periodos de tiempo independientes (sin influencia de la hemoglobina glicosilada que tiene un periodo de 3 meses de medición). Un valor controlado de HbA1c es inferior a 7% para diabéticos y de creatinina es entre 0.7 y 1.3 mg/dL para hombres y 0.6 - 1.1 mg/dL para mujeres.
+
+Preparar librerías requeridas
+````{r}
+### install.packages("dplyr", dependencies=TRUE) #Necesario si no se tiene la librería dplyr
+### install.packages("data.table", dependencies=TRUE) #Necesario si no se tiene la librería dplyr
+library(dplyr)
+library(data.table)
+````
+
+Cargar los datos(dataset completo)
+
+```{r}
+cohorte<-fread("T_Cohorte.csv", sep="\t", na.strings="NA")
+```
+
+Resumen del dataset
+```{r cohorte}
+summary(cohorte)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
