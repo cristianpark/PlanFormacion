@@ -14,11 +14,12 @@ knitr::opts_chunk$set(echo = TRUE)
 En el siguiente ejercicio se estudiará la correlación entre el resultado de hemoglobina glicosilada (HbA1c) y la creatinina en personas diabéticas en tres periodos de tiempo independientes (sin influencia de la hemoglobina glicosilada que tiene un periodo de 3 meses de medición). Un valor controlado de HbA1c es inferior a 7% para diabéticos y de creatinina es entre 0.7 y 1.3 mg/dL para hombres y 0.6 - 1.1 mg/dL para mujeres.
 
 Preparar librerías requeridas
-````{r}
+````{r echo=FALSE}
 ### install.packages("dplyr", dependencies=TRUE) #Necesario si no se tiene la librería dplyr
 ### install.packages("data.table", dependencies=TRUE) #Necesario si no se tiene la librería dplyr
 library(dplyr)
 library(data.table)
+library(ggplot2)
 ````
 
 Cargar los datos(dataset completo)
@@ -32,4 +33,23 @@ Resumen del dataset
 summary(cohorte)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Los campos de nuestro interés son `idpersona`, `fecha`, `creatinina` y `hemoglobina` por lo que se descartarán los demás campos y se crearán 3 datasets de los datos para meses donde la hemoglobina no tenga influencia (examen de 3 meses de ventana).
+
+````{r}
+cohorte<-cohorte%>%select(idpersona, fecha, creatinina, hemoglobina)
+
+##Datasets
+cohorte_ene<-cohorte%>%filter(fecha=="2015-01-31")
+cohorte_may<-cohorte%>%filter(fecha=="2015-05-31")
+cohorte_ago<-cohorte%>%filter(fecha=="2015-08-31")
+````
+
+## Correlación Enero
+
+Gráfico de hemoglobina vs creatinina.
+
+````{r echo=FALSE}
+ggplot(data=cohorte_ene, aes(x=hemoglobina, y=creatinina))+
+  geom_point()+
+  labs(x = "Hemoglobina", y="Creatinina")
+````
