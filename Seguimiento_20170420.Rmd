@@ -46,10 +46,28 @@ cohorte_ago<-cohorte%>%filter(fecha=="2015-08-31")
 
 ## Correlación Enero
 
-Gráfico de hemoglobina vs creatinina.
+Gráfico de creatinina vs hemoglobina.
 
 ````{r echo=FALSE}
 ggplot(data=cohorte_ene, aes(x=hemoglobina, y=creatinina))+
   geom_point()+
   labs(x = "Hemoglobina", y="Creatinina")
+
+ggplot(data=cohorte, aes(x=dias_patologia, y=creatinina))+
+  geom_point()+
+  labs(x = "Días P", y="Creatinina")
+````
+Búsqueda de outliers. Personas que tienen una creatinina >=2.5 y hemoglobina >=13
+````{r}
+cohorte_ene%>%
+  filter(creatinina>=2.5, hemoglobina>=13)
+````
+
+### Indice de correlación
+````{r}
+cohorte_ene %>%
+  summarize(N = n(), r = cor(creatinina, hemoglobina, use = "pairwise.complete.obs"))
+
+cohorte %>%
+  summarize(N = n(), r = cor(creatinina, dias_patologia, use = "pairwise.complete.obs"))
 ````
