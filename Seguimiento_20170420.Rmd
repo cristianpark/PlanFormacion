@@ -36,7 +36,7 @@ summary(cohorte)
 Los campos de nuestro interés son `idpersona`, `fecha`, `creatinina` y `hemoglobina` por lo que se descartarán los demás campos y se crearán 3 datasets de los datos para meses donde la hemoglobina no tenga influencia (examen de 3 meses de ventana).
 
 ````{r}
-cohorte<-cohorte%>%select(idpersona, fecha, creatinina, hemoglobina)
+cohorte<-cohorte%>%select(idpersona, fecha, creatinina, hemoglobina, trigliceridos)
 
 ##Datasets
 cohorte_ene<-cohorte%>%filter(fecha=="2015-01-31")
@@ -49,14 +49,18 @@ cohorte_ago<-cohorte%>%filter(fecha=="2015-08-31")
 Gráfico de creatinina vs hemoglobina.
 
 ````{r echo=FALSE}
-ggplot(data=cohorte_ene, aes(x=hemoglobina, y=creatinina))+
+ggplot(data=cohorte_may, aes(x=hemoglobina, y=creatinina))+
   geom_point()+
   labs(x = "Hemoglobina", y="Creatinina")
-
-ggplot(data=cohorte, aes(x=dias_patologia, y=creatinina))+
-  geom_point()+
-  labs(x = "Días P", y="Creatinina")
 ````
+
+Analicemos ahora qué pasa con los triglicéridos en función de la hemoglobina
+````{r echo=FALSE}
+ggplot(data=cohorte_ago, aes(x=hemoglobina, y=trigliceridos))+
+  geom_point()+
+  labs(x = "Hemoglobina", y="Triglicéridos")
+````
+
 Búsqueda de outliers. Personas que tienen una creatinina >=2.5 y hemoglobina >=13
 ````{r}
 cohorte_ene%>%
@@ -65,9 +69,14 @@ cohorte_ene%>%
 
 ### Indice de correlación
 ````{r}
+#0.05
 cohorte_ene %>%
   summarize(N = n(), r = cor(creatinina, hemoglobina, use = "pairwise.complete.obs"))
 
+#0.16
+cohorte_may %>%
+  summarize(N = n(), r = cor(hemoglobina, trigliceridos, use = "pairwise.complete.obs"))
+
 cohorte %>%
-  summarize(N = n(), r = cor(creatinina, dias_patologia, use = "pairwise.complete.obs"))
+  summarize(N = n(), r = cor(hemoglobina, trigliceridos, use = "pairwise.complete.obs"))
 ````
