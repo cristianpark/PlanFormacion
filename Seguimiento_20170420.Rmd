@@ -103,3 +103,34 @@ El error de la raíz cuadrada de la media (RSME) indica que un valor ajustado pa
 predict(mod, newdata=list(hemoglobina=8))
 ````
 ## Coeficiente de determinación (R2)
+
+````{r}
+cohorte_acond<-augment(mod)
+
+#Calcular R2
+cohorte_acond %>%
+  summarize(var_y = var(creatinina), var_e = var(residuals(mod))) %>%
+  mutate(R_squared = 1-(var_e/var_y))
+````
+
+El 0.35% de la variación de creatinina puede ser explicado por el valor de la hemoglobina
+
+## Apalancamiento e influencia
+
+Apalancamiento
+
+````{r}
+mod %>%
+  augment() %>%
+  arrange(desc(.hat)) %>%
+  head(6)
+````
+
+Influencia
+
+````{r}
+mod %>%
+  augment() %>%
+  arrange(desc(.cooksd)) %>%
+  head(6)
+````
