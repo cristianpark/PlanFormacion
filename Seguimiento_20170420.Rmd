@@ -13,13 +13,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 En el siguiente ejercicio se estudiará la correlación entre el resultado de hemoglobina glicosilada (HbA1c) y la creatinina en personas diabéticas en tres periodos de tiempo independientes (sin influencia de la hemoglobina glicosilada que tiene un periodo de 3 meses de medición). Un valor controlado de HbA1c es inferior a 7% para diabéticos y de creatinina es entre 0.7 y 1.3 mg/dL para hombres y 0.6 - 1.1 mg/dL para mujeres.
 
+Si la correlación es muy baja entre ambas variables se probará también con trigliceridos cuyos valores referencia son <150 controlado, >200 alto.
+
 Preparar librerías requeridas
 ````{r echo=FALSE}
 ### install.packages("dplyr", dependencies=TRUE) #Necesario si no se tiene la librería dplyr
-### install.packages("data.table", dependencies=TRUE) #Necesario si no se tiene la librería dplyr
+### install.packages("data.table", dependencies=TRUE) #Necesario si no se tiene la librería data.table
+### install.packages("broom", dependencies=TRUE) #Necesario si no se tiene la librería broom
 library(dplyr)
 library(data.table)
 library(ggplot2)
+library(broom)
 ````
 
 Cargar los datos(dataset completo)
@@ -33,7 +37,7 @@ Resumen del dataset
 summary(cohorte)
 ```
 
-Los campos de nuestro interés son `idpersona`, `fecha`, `creatinina` y `hemoglobina` por lo que se descartarán los demás campos y se crearán 3 datasets de los datos para meses donde la hemoglobina no tenga influencia (examen de 3 meses de ventana).
+Los campos de nuestro interés son `idpersona`, `fecha`, `creatinina`, `hemoglobina`y `trigliceridos` por lo que se descartarán los demás campos y se crearán 3 datasets de los datos para meses donde la hemoglobina no tenga influencia (examen de 3 meses de ventana).
 
 ````{r}
 cohorte<-cohorte%>%select(idpersona, fecha, creatinina, hemoglobina, trigliceridos)
@@ -54,7 +58,7 @@ ggplot(data=cohorte_may, aes(x=hemoglobina, y=creatinina))+
   labs(x = "Hemoglobina", y="Creatinina")
 ````
 
-Analicemos ahora qué pasa con los triglicéridos en función de la hemoglobina
+Analicemos ahora qué pasa con los triglicéridos en función de la hemoglobina, qué indica ésta
 ````{r echo=FALSE}
 ggplot(data=cohorte_ago, aes(x=hemoglobina, y=trigliceridos))+
   geom_point()+
@@ -69,7 +73,6 @@ cohorte_ene%>%
 
 ### Indice de correlación
 ````{r}
-#0.05
 cohorte_ene %>%
   summarize(N = n(), r = cor(creatinina, hemoglobina, use = "pairwise.complete.obs"))
 
@@ -80,3 +83,23 @@ cohorte_may %>%
 cohorte %>%
   summarize(N = n(), r = cor(hemoglobina, trigliceridos, use = "pairwise.complete.obs"))
 ````
+El índice de correlación es muy bajo por lo que no podemos determinar una relación fuerte entre ambas variables. Veamos ahora cómo se comporta un modelo linear con ésta relación.
+````{r}
+ggplot(data = cohorte_ene, aes(x = hemoglobina, y = creatinina)) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE)
+````
+Según la gráfica la relación es negativa, ahora veamos sus parámetros e interpretaciones
+````{r}
+mod<-lm(creatinina~hemoglobina, data = cohorte_ene)
+summary(mod)
+````
+El intercepto es 1.6936 y la pendiente -0.03150 lo que significa que un cambio de 1% en el valor de la hemoglobina representa un cambio de -0.03150 en la creatinina.
+
+El error de la raíz cuadrada de la media (RSME) indica que un valor ajustado para el modelo va a variar en 0.8714 unidades (en el caso de la creatinina, mg/dL) respecto a un valor real.
+
+### Predicciones usando el modelo linear
+````{r}
+predict(mod, newdata=list(hemoglobina=8))
+````
+## Coeficiente de determinación (R2)
