@@ -117,7 +117,7 @@ El 0.35% de la variación de creatinina puede ser explicado por el valor de la h
 
 ## Apalancamiento e influencia
 
-Apalancamiento
+Apalancamiento: define la distancia del valor de la media de la variable explicatoria. Entre más valor de apalancamiento más distante de la media, sin embargo ésto no significa que la observación tenga mayor influencia.
 
 ````{r}
 mod %>%
@@ -126,7 +126,7 @@ mod %>%
   head(6)
 ````
 
-Influencia
+Influencia: la influencia depende del valor de apalancamiento de la observación así como de la magnitud de su residuo. Los puntos influenciadores tienen tendencia a tener apalancamiento alto y desviarse de la relación general de las dos variables.
 
 ````{r}
 mod %>%
